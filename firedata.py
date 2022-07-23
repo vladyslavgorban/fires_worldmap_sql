@@ -63,7 +63,7 @@ class FiresData:
                 Column('cur_date', DATE),
                 Column('latitude', NUMERIC(7.5)),
                 Column('longitude', NUMERIC(7.5)),
-                Column('frp', NUMERIC(4.2))
+                Column('frp', NUMERIC(6.2))
             )
             self.metadata_obj.create_all(self.engine)
 
@@ -95,18 +95,21 @@ class FiresData:
         self._frp = float(row[self._data_columns['frp']])
 
     def export_frp_data(self, arename):
-        """get data from table in db and prepare list with lon, lat, frp"""
+        """get data from table in db and prepare list with lon, lat, frp, cur_date"""
 
-        query = f"SELECT latitude, longitude, frp FROM {arename};"
+        query = f"SELECT latitude, longitude, frp, cur_date FROM {arename};"
         firedata = {
             'lat': [],
             'lon': [],
-            'frp': []
+            'frp': [],
+            'dates': []
         }
         with self.engine.connect() as conn:
             for row in conn.execute(text(query)):
                 firedata['lat'].append(row[0])
                 firedata['lon'].append(row[1])
                 firedata['frp'].append(row[2])
+                # firedata['dates'].append(datetime.strptime(row[3], "%Y-%m-%d"))
+                firedata['dates'].append(row[3])
 
         return firedata

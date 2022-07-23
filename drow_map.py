@@ -6,7 +6,7 @@ import math
 # https://plotly.com/python/scatter-plots-on-maps/ 
 
 
-def draw_fire_map(name, lons, lats, frps):
+def draw_fire_map(name, dates, lons, lats, frps):
     """drow fires with fire radiative power on the map"""
     chart_title = name
     
@@ -15,8 +15,9 @@ def draw_fire_map(name, lons, lats, frps):
         'type': 'scattergeo',
         'lon': lons,
         'lat': lats,
+        'text': dates,
         'marker': {
-            'size': [frp ** (0.5) for frp in frps],
+            'size': [frp ** (0.37) for frp in frps],
             'color': frps,
             'colorscale': 'Portland',
             'reversescale': False,
