@@ -1,5 +1,5 @@
 import csv
-from sqlalchemy import DATE, INTEGER, NUMERIC, TIMESTAMP, Column, MetaData, PrimaryKeyConstraint, create_engine, Table
+from sqlalchemy import DATE, INTEGER, NUMERIC, TIMESTAMP, Column, MetaData, PrimaryKeyConstraint, create_engine, Table, text
 from datetime import datetime
 
 class FiresData:
@@ -21,6 +21,10 @@ class FiresData:
 
     def get_data_from_csv(self, areaname, filepath):
         """open csv file and create table for firesdat with given name"""
+        if areaname in self.metadata_obj.tables:
+            print(f"Table '{areaname}' already exsists. Rename or delete'")
+            return False
+        
         # create table
         self._create_firetable(areaname)
 
@@ -52,19 +56,16 @@ class FiresData:
 
     def _create_firetable(self, areaname):
             """create table in db for area with given name"""
-            if areaname in self.metadata_obj.tables:
-                print(f"Table '{areaname}' already exsists. Rename or delete'")
-            else:
-                Table(
-                    areaname,
-                    self.metadata_obj, 
-                    Column('id', INTEGER, primary_key=True) ,
-                    Column('cur_date', DATE),
-                    Column('latitude', NUMERIC(7.5)),
-                    Column('longitude', NUMERIC(7.5)),
-                    Column('frp', NUMERIC(4.2))
-                )
-                self.metadata_obj.create_all(self.engine)
+            Table(
+                areaname,
+                self.metadata_obj, 
+                Column('id', INTEGER, primary_key=True) ,
+                Column('cur_date', DATE),
+                Column('latitude', NUMERIC(7.5)),
+                Column('longitude', NUMERIC(7.5)),
+                Column('frp', NUMERIC(4.2))
+            )
+            self.metadata_obj.create_all(self.engine)
 
     def _define_csv_col_number(self):
         """define which column in csv corresponds to fires datatype"""
@@ -92,3 +93,20 @@ class FiresData:
         self._lat = float(row[self._data_columns['lat']])
         self._lon = float(row[self._data_columns['lon']])
         self._frp = float(row[self._data_columns['frp']])
+
+    def export_frp_data(self, arename):
+        """get data from table in db and prepare list with lon, lat, frp"""
+
+        query = f"SELECT latitude, longitude, frp FROM {arename};"
+        firedata = {
+            'lat': [],
+            'lon': [],
+            'frp': []
+        }
+        with self.engine.connect() as conn:
+            for row in conn.execute(text(query)):
+                firedata['lat'].append(row[0])
+                firedata['lon'].append(row[1])
+                firedata['frp'].append(row[2])
+
+        return firedata
