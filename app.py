@@ -1,3 +1,5 @@
+"""app to run and display fires fata on the map"""
+
 from drow_map import draw_fire_map
 from firedata import FiresData
 

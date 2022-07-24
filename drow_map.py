@@ -4,6 +4,7 @@ import math
 
 # https://plotly.github.io/plotly.py-docs/generated/plotly.express.scatter_mapbox.html
 # https://plotly.com/python/scatter-plots-on-maps/ 
+# https://plotly.com/python/reference/
 
 
 def draw_fire_map(name, dates, lons, lats, frps):
